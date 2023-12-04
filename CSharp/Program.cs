@@ -1,8 +1,10 @@
 ﻿await Day1_Part1("../../../Day1.txt");
 await Day1_Part2("../../../Day1.txt");
+await Day2_Part1("../../../Day2.txt");
+await Day2_Part2("../../../Day2.txt");
 
 
-static async Task Day1_Part1(string filePath)
+async Task Day1_Part1(string filePath)
 {
     var lines = await File.ReadAllLinesAsync(filePath);
 
@@ -17,10 +19,10 @@ static async Task Day1_Part1(string filePath)
         return innerTotal;
     });
 
-    Console.WriteLine($"Part 1 Result: {total}");
+    Console.WriteLine($"Day 1 Part 1 Result: {total}");
 }
 
-static async Task Day1_Part2(string filePath)
+async Task Day1_Part2(string filePath)
 {
     var lines = await File.ReadAllLinesAsync(filePath);
 
@@ -99,5 +101,98 @@ static async Task Day1_Part2(string filePath)
         return innerTotal;
     });
 
-    Console.WriteLine($"Part 1 Result: {total}");
+    Console.WriteLine($"Day 1 Part 2 Result: {total}");
+}
+
+async Task Day2_Part1(string filePath)
+{
+    var lines = await File.ReadAllLinesAsync(filePath);
+
+    var total = 0;
+    foreach (var line in lines)
+    {
+        var parts = line.Split(':');
+
+        var gameNumber = int.Parse(parts[0].Split(' ')[1]);
+
+        var sets = parts[1].Split(';');
+
+        foreach (var set in sets)
+        {
+            var pulls = set.Split(',');
+
+            foreach (var pull in pulls)
+            {
+                var colorParts = pull.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var count = int.Parse(colorParts[0]);
+
+                var possible = colorParts[1] switch
+                {
+                    "blue" => count <= 14,
+                    "red" => count <= 12,
+                    "green" => count <= 13,
+                    _ => false
+                };
+
+                if (!possible)
+                {
+                    goto done;
+                }
+            }
+        }
+
+        total += gameNumber;
+
+    done:;
+
+    }
+
+    Console.WriteLine($"Day 2 Part 1 Result: {total}");
+}
+
+async Task Day2_Part2(string filePath)
+{
+    var lines = await File.ReadAllLinesAsync(filePath);
+
+    var total = 0;
+    foreach (var line in lines)
+    {
+        var parts = line.Split(':');
+
+        var gameNumber = int.Parse(parts[0].Split(' ')[1]);
+
+        var sets = parts[1].Split(';');
+
+        var red = 0;
+        var green = 0;
+        var blue = 0;
+
+        foreach (var set in sets)
+        {
+            var pulls = set.Split(',');
+
+            foreach (var pull in pulls)
+            {
+                var colorParts = pull.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var count = int.Parse(colorParts[0]);
+
+                switch (colorParts[1])
+                {
+                    case "blue":
+                        blue = Math.Max(blue, count);
+                        break;
+                    case "red":
+                        red = Math.Max(red, count);
+                        break;
+                    case "green":
+                        green = Math.Max(green, count);
+                        break;
+                };
+            }
+        }
+
+        total += (red * green * blue);
+    }
+
+    Console.WriteLine($"Day 2 Part 2 Result: {total}");
 }
