@@ -1,7 +1,9 @@
-﻿await Day1_Part1("../../../Day1.txt");
-await Day1_Part2("../../../Day1.txt");
-await Day2_Part1("../../../Day2.txt");
-await Day2_Part2("../../../Day2.txt");
+﻿//await Day1_Part1("../../../Day1.txt");
+//await Day1_Part2("../../../Day1.txt");
+//await Day2_Part1("../../../Day2.txt");
+//await Day2_Part2("../../../Day2.txt");
+await Day3_Part1("../../../Day3.txt");
+await Day3_Part2("../../../Day3.txt");
 
 
 async Task Day1_Part1(string filePath)
@@ -195,4 +197,113 @@ async Task Day2_Part2(string filePath)
     }
 
     Console.WriteLine($"Day 2 Part 2 Result: {total}");
+}
+
+async Task Day3_Part1(string filePath)
+{
+    var lines = await File.ReadAllLinesAsync(filePath);
+
+    var numberPositions = new Dictionary<(int X, int Y), (List<(int X, int Y)> Positions, int Number)>();
+    var parts = new HashSet<(int X, int Y)>();
+
+    for (int x = 0; x < lines.Length; x++)
+    {
+        for (int y = 0; y < lines[x].Length; y++)
+        {
+            var val = lines[x][y];
+            if (char.IsNumber(val))
+            {
+                numberPositions.TryGetValue((x, y - 1), out var previousNumberPosition);
+                var positions = previousNumberPosition.Positions ?? [];
+                positions.Add((x, y));
+
+                var number = previousNumberPosition.Number;
+                number = number * 10 + Math.Max((int)char.GetNumericValue(val), 0);
+
+                numberPositions.Add((x, y), (positions, number));
+            }
+            else if (val != '.')
+            {
+                parts.Add((x, y));
+            }
+        }
+    }
+
+    var total = 0;
+
+    foreach (var part in parts)
+    {
+        for (int i = part.X - 1; i < part.X + 2; i++)
+        {
+            for (int j = part.Y - 1; j < part.Y + 2; j++)
+            {
+                if (numberPositions.TryGetValue((i, j), out var numberPosition))
+                {
+                    total += numberPositions[numberPosition.Positions.Last()].Number;
+                    foreach (var item in numberPosition.Positions)
+                    {
+                        numberPositions.Remove(item);
+                    }
+                }
+            }
+        }
+    }
+
+    Console.WriteLine($"Day 3 Part 1 Result: {total}");
+}
+
+async Task Day3_Part2(string filePath)
+{
+    var lines = await File.ReadAllLinesAsync(filePath);
+
+    var numberPositions = new Dictionary<(int X, int Y), (List<(int X, int Y)> Positions, int Number)>();
+    var parts = new HashSet<(int X, int Y)>();
+
+    for (int x = 0; x < lines.Length; x++)
+    {
+        for (int y = 0; y < lines[x].Length; y++)
+        {
+            var val = lines[x][y];
+            if (char.IsNumber(val))
+            {
+                numberPositions.TryGetValue((x, y - 1), out var previousNumberPosition);
+                var positions = previousNumberPosition.Positions ?? [];
+                positions.Add((x, y));
+
+                var number = previousNumberPosition.Number;
+                number = number * 10 + Math.Max((int)char.GetNumericValue(val), 0);
+
+                numberPositions.Add((x, y), (positions, number));
+            }
+            else if (val == '*')
+            {
+                parts.Add((x, y));
+            }
+        }
+    }
+
+    var total = 0;
+
+    foreach (var part in parts)
+    {
+        var adjacentNumbers = new Dictionary<List<(int X, int Y)>, int>();
+
+        for (int i = part.X - 1; i < part.X + 2; i++)
+        {
+            for (int j = part.Y - 1; j < part.Y + 2; j++)
+            {
+                if (numberPositions.TryGetValue((i, j), out var numberPosition))
+                {
+                    adjacentNumbers.TryAdd(numberPosition.Positions, numberPositions[numberPosition.Positions.Last()].Number);
+                }
+            }
+        }
+
+        if(adjacentNumbers.Count == 2)
+        {
+            total += adjacentNumbers.First().Value * adjacentNumbers.Last().Value;
+        }
+    }
+
+    Console.WriteLine($"Day 3 Part 2 Result: {total}");
 }
