@@ -2,8 +2,10 @@
 //await Day1_Part2("../../../Day1.txt");
 //await Day2_Part1("../../../Day2.txt");
 //await Day2_Part2("../../../Day2.txt");
-await Day3_Part1("../../../Day3.txt");
-await Day3_Part2("../../../Day3.txt");
+//await Day3_Part1("../../../Day3.txt");
+//await Day3_Part2("../../../Day3.txt");
+await Day4_Part1("../../../Day4.txt");
+await Day4_Part2("../../../Day4.txt");
 
 
 async Task Day1_Part1(string filePath)
@@ -299,11 +301,70 @@ async Task Day3_Part2(string filePath)
             }
         }
 
-        if(adjacentNumbers.Count == 2)
+        if (adjacentNumbers.Count == 2)
         {
             total += adjacentNumbers.First().Value * adjacentNumbers.Last().Value;
         }
     }
 
     Console.WriteLine($"Day 3 Part 2 Result: {total}");
+}
+
+async Task Day4_Part1(string filePath)
+{
+    var lines = await File.ReadAllLinesAsync(filePath);
+
+    var total = 0;
+
+    foreach (var line in lines)
+    {
+        var cardValues = line.Split(':')[1];
+        var cardNumbers = cardValues.Split('|');
+
+        var winningNumbers = cardNumbers[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var yourNumbers = cardNumbers[1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        var winningCount = yourNumbers.Where(n => winningNumbers.Contains(n)).Count();
+
+        if (winningCount > 0)
+        {
+            total += (int)Math.Pow(2, winningCount - 1);
+        }
+    }
+
+    Console.WriteLine($"Day 4 Part 1 Result: {total}");
+}
+
+async Task Day4_Part2(string filePath)
+{
+    var lines = await File.ReadAllLinesAsync(filePath);
+
+    var winningTickets = lines.Select((l, ix) => ix).ToDictionary(ix => ix, ix => 1);
+
+    for (int i = 0; i < lines.Length; i++)
+    {
+        var line = lines[i];
+        var cardValues = line.Split(':')[1];
+        var cardNumbers = cardValues.Split('|');
+
+        var winningNumbers = cardNumbers[0].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var yourNumbers = cardNumbers[1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        var winningCount = yourNumbers.Where(n => winningNumbers.Contains(n)).Count();
+        winningTickets.TryGetValue(i, out var copies);
+
+        for (int j = 0; j < winningCount; j++)
+        {
+            if (winningTickets.ContainsKey(i + j + 1))
+            {
+                winningTickets[i + j + 1] += copies;
+            }
+            else
+            {
+                winningTickets.Add(i + j + 1, copies);
+            }
+        }
+    }
+
+    Console.WriteLine($"Day 4 Part 2 Result: {winningTickets.Sum(x => x.Value)}");
 }
