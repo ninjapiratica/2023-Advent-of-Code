@@ -4,8 +4,10 @@
 //await Day2_Part2("../../../Day2.txt");
 //await Day3_Part1("../../../Day3.txt");
 //await Day3_Part2("../../../Day3.txt");
-await Day4_Part1("../../../Day4.txt");
-await Day4_Part2("../../../Day4.txt");
+//await Day4_Part1("../../../Day4.txt");
+//await Day4_Part2("../../../Day4.txt");
+//await Day5_Part1("../../../Day5.txt");
+await Day5_Part2("../../../Day5.txt");
 
 
 async Task Day1_Part1(string filePath)
@@ -367,4 +369,108 @@ async Task Day4_Part2(string filePath)
     }
 
     Console.WriteLine($"Day 4 Part 2 Result: {winningTickets.Sum(x => x.Value)}");
+}
+
+async Task Day5_Part1(string filePath)
+{
+    var lines = await File.ReadAllLinesAsync(filePath);
+
+    var seeds = lines[0].Split(':')[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
+    var maps = new List<List<(long SourceStart, long TargetStart, long Range)>>(7);
+
+    for (int i = 1; i < lines.Length; i++)
+    {
+        if (lines[i] == string.Empty) continue;
+
+        if (lines[i].EndsWith(':'))
+        {
+            maps.Add([]);
+        }
+        else
+        {
+            var map = maps.Last();
+            var parts = lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
+            map.Add((parts[1], parts[0], parts[2]));
+        }
+    }
+
+    var minLocation = long.MaxValue;
+
+    foreach (var seed in seeds)
+    {
+        var currentLocation = seed;
+
+        foreach (var map in maps)
+        {
+            foreach (var rangeMap in map)
+            {
+                if (rangeMap.SourceStart <= currentLocation && rangeMap.SourceStart + rangeMap.Range > currentLocation)
+                {
+                    currentLocation = rangeMap.TargetStart + (currentLocation - rangeMap.SourceStart);
+                    break;
+                }
+            }
+        }
+
+        minLocation = Math.Min(minLocation, currentLocation);
+    }
+
+    Console.WriteLine($"Day 5 Part 1 Result: {minLocation}");
+}
+
+async Task Day5_Part2(string filePath)
+{
+    var lines = await File.ReadAllLinesAsync(filePath);
+
+    var seedRanges = lines[0].Split(':')[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
+    var seeds = new List<long>();
+
+    for (int i = 0; i < seedRanges.Length; i+=2)
+    {
+        for (int j = 0; j < seedRanges[i + 1]; j++)
+        {
+            seeds.Add(seedRanges[i] + j);
+        }
+    }
+
+    var maps = new List<List<(long SourceStart, long TargetStart, long Range)>>(7);
+
+    for (int i = 1; i < lines.Length; i++)
+    {
+        if (lines[i] == string.Empty) continue;
+
+        if (lines[i].EndsWith(':'))
+        {
+            maps.Add([]);
+        }
+        else
+        {
+            var map = maps.Last();
+            var parts = lines[i].Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(long.Parse).ToArray();
+            map.Add((parts[1], parts[0], parts[2]));
+        }
+    }
+
+    var minLocation = long.MaxValue;
+
+    foreach (var seed in seeds)
+    {
+        var currentLocation = seed;
+
+        foreach (var map in maps)
+        {
+            foreach (var rangeMap in map)
+            {
+                if (rangeMap.SourceStart <= currentLocation && rangeMap.SourceStart + rangeMap.Range > currentLocation)
+                {
+                    currentLocation = rangeMap.TargetStart + (currentLocation - rangeMap.SourceStart);
+                    break;
+                }
+            }
+        }
+
+        minLocation = Math.Min(minLocation, currentLocation);
+    }
+
+    Console.WriteLine($"Day 5 Part 1 Result: {minLocation}");
 }
